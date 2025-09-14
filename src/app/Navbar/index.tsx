@@ -6,7 +6,7 @@ import { usePathname } from 'next/navigation';
 
 import { useState, useEffect } from 'react';
 import Dropdown from './Dropdown';
-import LocalDropdown from './localDropdown';
+import LocalDropdown from './LocalDropdown';
 
 const Navbar = () => {
   const currentRoute = usePathname();
