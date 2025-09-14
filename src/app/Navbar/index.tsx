@@ -5,92 +5,8 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
 import { useState, useEffect } from 'react';
-
-import { ChevronDown, ArrowRight } from 'lucide-react';
-
-export const SaaSDropdown = () => {
-  return (
-    <div className='absolute top-20 left-0 w-full bg-black text-white shadow-md rounded-bl-lg rounded-br-lg p-10'>
-      <div className='grid grid-cols-3 gap-10 mt-4'>
-        <div>
-          <p className='py-5 text-gray-400'>
-            Explore Asia’s vibrant cultures, from Japan’s futuristic cities to
-            Bali’s serene beaches. Discover ancient wonders, mouthwatering
-            cuisines, and breathtaking landscapes that make every journey
-            unforgettable.
-          </p>
-          <Link href='#' className='flex gap-3 items-center text-gray-400'>
-            Learn More <ArrowRight size={20} />
-          </Link>
-        </div>
-        <div>
-          <p className='py-5 text-gray-400'>
-            Experience Africa’s untamed beauty, from thrilling safaris to
-            stunning coastlines. Dive into its rich cultures, vibrant cities,
-            and awe-inspiring natural wonders like Victoria Falls.
-          </p>
-          <Link href='#' className='flex gap-3 items-center text-gray-400'>
-            Learn More <ArrowRight size={20} />
-          </Link>
-        </div>
-        <div>
-          <p className='py-5 text-gray-400'>
-            Journey through Europe’s charming cities and historic landmarks.
-            From Paris’s romance to Rome’s ancient ruins, every destination is a
-            story waiting to be discovered.
-          </p>
-          <Link href='#' className='flex gap-3 items-center text-gray-400'>
-            Learn More <ArrowRight size={20} />
-          </Link>
-        </div>
-      </div>
-      <hr className='my-10 border-none outline-none h-0.5 rounded-2xl bg-gray-400' />
-      <div className='flex justify-between items-center'>
-        <p className='text-lg w-1/2 text-gray-400'>
-          Still confused about where to go? See the most popular destinations
-          our travelers love to visit.
-        </p>
-        <Link
-          href='/destination'
-          className='text-black flex items-center gap-3 bg-white px-4 py-2 rounded'
-        >
-          Explore <ArrowRight size={20} />
-        </Link>
-      </div>
-    </div>
-  );
-};
-
-export const TravelPlannerDropdown = () => {
-  return (
-    <div className='absolute top-20 left-0 w-full bg-black text-white shadow-md rounded-bl-lg rounded-br-lg p-10'>
-      <div className='grid grid-cols-3 gap-10 mt-4'>
-        <div className='bg-honeymoon h-[400px] w-full rounded-xl bg-cover bg-center relative'>
-          <p className='p-5 text-white bg-black/90 w-full absolute bottom-0'>
-            Explore Asia’s vibrant cultures, from Japan’s futuristic cities to
-            Bali’s serene beaches. Discover ancient wonders, mouthwatering
-            cuisines, and breathtaking landscapes that make every journey
-            unforgettable.
-          </p>
-        </div>
-        <div className='bg-weekend h-[400px] w-full rounded-xl bg-cover bg-center relative'>
-          <p className='p-5 text-white bg-black/90 w-full absolute bottom-0'>
-            Experience Africa’s untamed beauty, from thrilling safaris to
-            stunning coastlines. Dive into its rich cultures, vibrant cities,
-            and awe-inspiring natural wonders like Victoria Falls.
-          </p>
-        </div>
-        <div className='bg-family h-[400px] w-full rounded-xl bg-cover bg-center relative'>
-          <p className='p-5 text-white bg-black/90 w-full absolute bottom-0'>
-            Journey through Europe’s charming cities and historic landmarks.
-            From Paris’s romance to Rome’s ancient ruins, every destination is a
-            story waiting to be discovered.
-          </p>
-        </div>
-      </div>
-    </div>
-  );
-};
+import Dropdown from './Dropdown';
+import LocalDropdown from './localDropdown';
 
 const Navbar = () => {
   const currentRoute = usePathname();
@@ -100,16 +16,28 @@ const Navbar = () => {
     dropdownName: '',
   });
 
+  const [showDropdown, setShowDropdown] = useState(false);
   useEffect(() => {
     setActiveDropdown({ active: false, dropdownName: '' });
+    setShowDropdown(false);
   }, [currentRoute]);
+
+  useEffect(() => {
+    if (activeDropdown.active) {
+      // 展開動畫 300ms 後顯示 Dropdown
+      const timer = setTimeout(() => setShowDropdown(true), 300);
+      return () => clearTimeout(timer);
+    } else {
+      setShowDropdown(false);
+    }
+  }, [activeDropdown]);
 
   return (
     <>
       <header className='fixed top-[1.4rem] md:top-[2.1rem] left-1/2 -translate-x-1/2 w-[90%] max-w-full min-h-24 z-[100]'>
         <div
           className={`${
-            activeDropdown.active ? 'min-h-[590px]' : 'min-h-24'
+            activeDropdown.active ? 'min-h-[400px]' : 'min-h-24'
           } w-full rounded-lg text-black bg-[#ffffffd9] backdrop-blur-[5px] transition-[min-height] duration-500 ease-in-out`}
           onMouseLeave={() =>
             setActiveDropdown({ active: false, dropdownName: '' })
@@ -119,7 +47,7 @@ const Navbar = () => {
             <div className='flex items-center justify-between gap-16'>
               {/* Logo */}
               <Link href='/'>
-                <span className='block bg-[url(/logo.svg)] bg-no-repeat w-[19.5rem] h-[3.7rem]' />
+                <span className='block bg-[url(/logo.svg)] bg-contain bg-no-repeat w-[19.5rem] h-16' />
               </Link>
               {/* Navigation Links */}
               <nav>
@@ -132,42 +60,47 @@ const Navbar = () => {
                       })
                     }
                   >
-                    <p className='block h-fit text-2xl leading-[1.05] tracking-[0.03em] relative z-[2] cursor-pointer'>
-                      雲端服務
+                    <p className='block h-fit text-2xl leading-[1.05] tracking-[0.03em] relative z-[2] cursor-pointer group/saas'>
+                      <span className='flex items-center gap-[0.9rem] relative text-transparent bg-gradient-to-r from-primary from-20% to-black to-30% bg-clip-text bg-size-[500%_500%] bg-position-[45%_0%] transition-background duration-300 ease-in-out group-hover/saas:bg-position-[0%_0%]'>
+                        雲端服務
+                        <span className='block w-[0.9rem] h-[0.9rem] relative'>
+                          <span className='absolute top-1/2 left-1/2 -translate-1/2 block bg-black transition-transform duration-300 ease-in-out w-full h-[2px] group-hover/saas:bg-primary'></span>
+                          <span className='absolute top-1/2 left-1/2 -translate-1/2 block bg-black transition-transform duration-300 ease-in-out w-[2px] h-full group-hover/saas:bg-primary group-hover/saas:rotate-90'></span>
+                        </span>
+                      </span>
                     </p>
 
                     {/* Dropdown Menu */}
-                    {activeDropdown.active &&
-                      activeDropdown.dropdownName === 'saas' && (
-                        <SaaSDropdown />
-                      )}
+                    {showDropdown &&
+                      activeDropdown.active &&
+                      activeDropdown.dropdownName === 'saas' && <Dropdown />}
                   </li>
                   <li
                     onMouseEnter={() =>
                       setActiveDropdown({
                         active: true,
-                        dropdownName: 'planner',
+                        dropdownName: 'local',
                       })
                     }
                   >
-                    <p className='flex gap-1 items-center cursor-pointer'>
-                      Trip Planner
-                      <ChevronDown size={20} />
+                    <p className='block h-fit text-2xl leading-[1.05] tracking-[0.03em] relative z-[2] cursor-pointer group/saas'>
+                      <span className='flex items-center gap-[0.9rem] relative text-transparent bg-gradient-to-r from-primary from-20% to-black to-30% bg-clip-text bg-size-[500%_500%] bg-position-[45%_0%] transition-background duration-300 ease-in-out group-hover/saas:bg-position-[0%_0%]'>
+                        本地部屬
+                        <span className='block w-[0.9rem] h-[0.9rem] relative'>
+                          <span className='absolute top-1/2 left-1/2 -translate-1/2 block bg-black transition-transform duration-300 ease-in-out w-full h-[2px] group-hover/saas:bg-primary'></span>
+                          <span className='absolute top-1/2 left-1/2 -translate-1/2 block bg-black transition-transform duration-300 ease-in-out w-[2px] h-full group-hover/saas:bg-primary group-hover/saas:rotate-90'></span>
+                        </span>
+                      </span>
                     </p>
 
-                    {/* Dropdown menu */}
-                    {activeDropdown.active &&
-                      activeDropdown.dropdownName === 'planner' && (
-                        <TravelPlannerDropdown />
+                    {/* Dropdown Menu */}
+                    {showDropdown &&
+                      activeDropdown.active &&
+                      activeDropdown.dropdownName === 'local' && (
+                        <LocalDropdown />
                       )}
                   </li>
-                  <li
-                    onMouseEnter={() =>
-                      setActiveDropdown({ active: false, dropdownName: '' })
-                    }
-                  >
-                    <p className='cursor-pointer'>Deals</p>
-                  </li>
+
                   <li
                     onMouseEnter={() =>
                       setActiveDropdown({ active: false, dropdownName: '' })
